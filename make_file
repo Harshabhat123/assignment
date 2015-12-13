@@ -1,4 +1,4 @@
-rot13: aa1.o
-	gcc $(CFLAGS) -o rot13 aa1.o
-aa1.o: aa1.c
-	gcc -c aa1.c
+rot13: rot13_algo.o
+	gcc $(CFLAGS) -o rot13 rot13_algo.o
+rot13_algo.o: rot13_algo.c
+	gcc -c rot13_algo.c
