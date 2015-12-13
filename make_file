@@ -1,0 +1,4 @@
+rot13: aa1.o
+	gcc $(CFLAGS) -o rot13 aa1.o
+aa1.o: aa1.c
+	gcc -c aa1.c
