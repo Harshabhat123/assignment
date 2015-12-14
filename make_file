@@ -1,0 +1,4 @@
+rot13: rot13_algo.o
+	gcc $(CFLAGS) -o rot13 rot13_algo.o
+rot13_algo.o: rot13_algo.c
+	gcc -c rot13_algo.c
