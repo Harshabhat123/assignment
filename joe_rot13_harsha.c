@@ -52,8 +52,9 @@ do {\
     log_it (log_level, __FILE__, __FUNCTION__, __LINE__, ##fmt);\
 } while(0)
 /******************************************************************************/
-int rot13_encrypt (uchar_t *buffer,ssize_t size)
+int rot13_encrypt (uchar_t *buffer,ssize_t size,int des_fd)
 {
+    int j   =   0;
     int ret = -1;
         ssize_t i = 0;
     if (!buffer) {
@@ -65,16 +66,20 @@ if (size == 0) {
     goto out;
 }
     for (i = 0; i < size ; i++) {
-        *(buffer + i) = (*(buffer+i) + 13) % MAX_VALUE;
+        *(buffer + i) = (*(buffer+i) + 13) % 256;
 }
+
     ret = 0;
 out:
     return ret;
 }
 
 
-int ro13_decrypt (uchar_t *buffer,ssize_t size)
+int ro13_decrypt (uchar_t *buffer,ssize_t size,int des_fd)
 {
+    //int i   =   0;
+    int val =   0;
+    int chr1 =  0;
     int ret = -1;
         schar_t diff = 0;
     int i = 0;
@@ -88,15 +93,19 @@ goto out;
 }
 
 for (i = 0; i < size ; i++) {
-    diff = (*(buffer+i) - 13);
-    
-if (diff < 0) {
-    *(buffer+i) = MAX_VALUE + diff;
+    chr1 = *(buffer+i);
+    if(chr1<13)
+    {
+        diff = 13 - chr1;
+        val = 256 - diff;
+        *(buffer+i) = val;
     }
-    else {
-    *(buffer+i) = diff;
+    else
+    {
+        *(buffer+i) = chr1 - 13;
     }
 }
+
     ret = 0;
 out:
     return ret;
@@ -143,7 +152,7 @@ if (des_fd < 0) {
 goto out;
 }
 
-while ( (ret = read (src_fd, buffer, BLOCK_SIZE)) != 0 ) 
+while ( (ret = read (src_fd, buffer, BLOCK_SIZE)) > 0 ) 
 {
     if (ret < 0) 
         {
@@ -152,15 +161,16 @@ while ( (ret = read (src_fd, buffer, BLOCK_SIZE)) != 0 )
         }
 
     buffer_len = ret;
-    ret = (do_encrypt) ? rot13_encrypt (buffer, buffer_len) :
-    ro13_decrypt (buffer, buffer_len);
+    ret = (do_encrypt) ? rot13_encrypt (buffer, buffer_len,des_fd) :
+    ro13_decrypt (buffer, buffer_len,des_fd);
 
     if (ret) {
         LOG_IT (log_error, "Error %s the block",
         (do_encrypt) ? "encrypting" : "decrypting");
     goto out;
 }
-
+    i=0;
+    
     ret = write (des_fd, buffer, buffer_len);
 
     if (ret < 0)
