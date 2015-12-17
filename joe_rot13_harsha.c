@@ -34,14 +34,14 @@ typedef enum boolean{
     
 /* Function used for logging */
  void log_it (log_level_t log_level,
-        const char *file_name,
-        const char *function,
-        int line,
-        const char *fmt, ...)
+        const char      *file_name,
+        const char      *function,
+        int             line,
+        const char      *fmt, ...)
  {
-        FILE *stream = NULL;
+        FILE *stream    =   NULL;
         va_list arg_list;
-        char *message = NULL;
+        char *message   =   NULL;
     
     
         if (log_level == -1)
@@ -77,24 +77,24 @@ do {\
 
 int rot13_encrypt (uchar_t *buffer, ssize_t size, int des_fd)
 {
-        int j   =   0;
-        int ret = -1;
-        ssize_t i = 0;
+        int j            =     0;
+        int ret          =     -1;
+        ssize_t i        =     0;
         
         if (!buffer) {
             LOG_IT (log_error, "Empty Buffer");
-        goto out;
-}
+            goto out;
+        }
 
 
         if (size == 0) {
             LOG_IT (log_error, "Buffer size is zero");
-        goto out;
-}
+            goto out;
+        }
 
         for (i = 0; i < size ; i++) {
             *(buffer + i) = (*(buffer+i) + 13) % 256;
-}
+        }
 
 
         ret = 0;
@@ -106,23 +106,23 @@ out:
 int ro13_decrypt (uchar_t *buffer, ssize_t size, int des_fd)
 {
 
-        int     val     =       0;
-        int     chr1    =       0;
-        int     ret     =       -1;
-        schar_t diff    =       0;
-        int     i       =       0;
+        int         val          =       0;
+        int         chr1         =       0;
+        int         ret          =       -1;
+        schar_t     diff         =       0;
+        int         i            =       0;
     
     
         if (!buffer) {
                 LOG_IT (log_error, "Empty Buffer");
-        goto out;
-}
+                goto out;
+        }
 
 
         if (size == 0) {
             LOG_IT (log_error, "Buffer size is zero");
-        goto out;
-}
+            goto out;
+        }
 
         for (i = 0; i < size ; i++) {
     
@@ -137,7 +137,7 @@ int ro13_decrypt (uchar_t *buffer, ssize_t size, int des_fd)
         {
             *(buffer+i) = chr1 - 13;
         }
-}
+    }
 
         ret = 0;
 out:
@@ -153,12 +153,12 @@ out:
 
 int crypt_rot13_file (const char *src_file_name, const char *des_file_name, boolean_t do_encrypt)
 {
-        int     ret     =   -1;
-        int     i       =   0;
-        int     src_fd  =   -1;
-        int     des_fd  =   -1;
-        uchar_t     buffer[1024]    =   {0};
-        ssize_t buffer_len          =   0;
+        int          ret     =   -1;
+        int          i       =   0;
+        int          src_fd  =   -1;
+        int          des_fd  =   -1;
+        uchar_t      buffer[1024]    =   {0};
+        ssize_t      buffer_len          =   0;
     
     
         if (!src_file_name) {
@@ -203,7 +203,6 @@ int crypt_rot13_file (const char *src_file_name, const char *des_file_name, bool
 
             buffer_len = ret;
     
-    
             ret = (do_encrypt) ? rot13_encrypt (buffer, buffer_len,des_fd) :
             ro13_decrypt (buffer, buffer_len,des_fd);
 
@@ -211,8 +210,8 @@ int crypt_rot13_file (const char *src_file_name, const char *des_file_name, bool
         if (ret) {
             LOG_IT (log_error, "Error %s the block",
             (do_encrypt) ? "encrypting" : "decrypting");
-        goto out;
-    }
+            goto out;
+        }
         i=0;
     
         ret = write (des_fd, buffer, buffer_len);
@@ -225,7 +224,7 @@ int crypt_rot13_file (const char *src_file_name, const char *des_file_name, bool
 
             goto out;
         }
-}
+    }
 
         ret = 0;
 out:
